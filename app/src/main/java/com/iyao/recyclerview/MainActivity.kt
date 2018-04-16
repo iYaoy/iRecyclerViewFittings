@@ -10,9 +10,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
 import android.widget.TextView
 import com.iyao.recyclerviewhelper.adapter.*
-import com.iyao.recyclerviewhelper.getWrappedPosition
 import com.iyao.recyclerviewhelper.itemdecoration.GridLayoutItemDecoration
-import com.iyao.recyclerviewhelper.takeIsInstance
 import com.iyao.recyclerviewhelper.touchevent.MutableListAdapterImpl
 import com.iyao.recyclerviewhelper.touchevent.addOnItemClickListener
 import com.iyao.recyclerviewhelper.touchevent.addOnItemLongClickListener
@@ -54,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             adapter = CachedStatusWrapper().apply {
                 client = CachedHeaderAndFooterWrapper().apply {
                     client = CachedMultipleChoiceWrapper().apply {
+                        setHasStableIds(true)
                         client = object : CachedAutoRefreshAdapter<String>() {
 
                             override fun getItemId(position: Int) = if (position in 0 until itemCount) position.toLong() else -1
@@ -63,7 +62,8 @@ class MainActivity : AppCompatActivity() {
                                         .inflate(android.R.layout.simple_list_item_multiple_choice, parent, false)
                                         .let {
                                             it.setBackgroundColor(Color.WHITE)
-                                            CacheViewHolder(it) }
+                                            CacheViewHolder(it)
+                                        }
                             }
 
                             override fun onBindViewHolder(holder: CacheViewHolder, position: Int) {
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                                     })
                 }
             }.apply {
-                setStatusView(-2, CacheViewHolder(layoutInflater.inflate(R.layout.layout_data_empty, recycler_view, false)))
+                addStatusView(-2, CacheViewHolder(layoutInflater.inflate(R.layout.layout_data_empty, recycler_view, false)))
             }
             addOnItemClickListener { _, viewHolder ->
                 adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.run {

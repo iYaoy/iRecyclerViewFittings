@@ -67,6 +67,10 @@ open class GridLayoutItemDecoration : RecyclerView.ItemDecoration() {
         }
     }
 
+    /**
+     * note: only one observer will be register to the same RecyclerView, no matter what.
+     * So, be careful with it.
+     */
     private fun registerObserverIfNeed(state: RecyclerView.State, parent: RecyclerView) {
         if (state.get<Boolean?>(KEY_REGISTER_OBSERVER) != true) {
             state.put(KEY_REGISTER_OBSERVER, true)
