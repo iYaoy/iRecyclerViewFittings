@@ -1,8 +1,8 @@
 package com.iyao.recyclerviewhelper.touchevent
 
 import com.iyao.recyclerviewhelper.adapter.MutableListAdapter
-import com.iyao.recyclerviewhelper.getWrappedPosition
-import com.iyao.recyclerviewhelper.takeIsInstance
+import com.iyao.recyclerviewhelper.adapter.getWrappedPosition
+import com.iyao.recyclerviewhelper.adapter.takeIsInstance
 import java.util.*
 
 class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCallback(dragDirs, swipeDirs) {

@@ -21,7 +21,10 @@ import kotlin.concurrent.timer
 class MainActivity : AppCompatActivity() {
 
     private val itemTouchHelper = ItemTouchHelper(MutableListAdapterImpl(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0))
+            ItemTouchHelper.LEFT
+                    or ItemTouchHelper.UP
+                    or ItemTouchHelper.RIGHT
+                    or ItemTouchHelper.DOWN, 0))
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
