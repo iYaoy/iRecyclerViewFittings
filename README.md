@@ -19,7 +19,7 @@ override fun set(index: Int, element: E): E {
     }
 }
 ```
-3, Multiple choice, headers and footers, status views(such as an empty placeholder or a network error display), all of that realized with wrapper. What's more, an observer is registered by wrapper to observe data change happend in client adapter. So you shouldn't need to take care of item view invalidate when data changed. Of course, you can let a wrapper wrapped by any other wrapper.
+3, Multiple choice, headers and footers, status views(such as an empty placeholder or a network error display), all of that realized with wrapper. What's more, an observer is registered by wrapper to observe data change happend in client adapter. So you shouldn't need to take care of item view invalidate when data changed. Of course, you can let a wrapper be wrapped by any other wrapper.
 ```
 recycler_view.apply {
     adapter = CachedStatusWrapper().apply {
@@ -118,3 +118,27 @@ typealias CachedStatusWrapper = StatusWrapper<CacheViewHolder>
 typealias CachedHeaderAndFooterWrapper = HeaderAndFooterWrapper<CacheViewHolder>
 typealias CachedMultipleChoiceWrapper = MultipleChoiceWrapper<CacheViewHolder>
 ```
+#TouchEvent
+Some commonly used touch event callbacks are provided by this project, OnItemClickedListener, OnItemLongClickedListener and a simple ItemTouchCallback. 
+
+1, OnItemClickedListener for item single tap, OnItemLongClickedListener for long press.
+```
+addOnItemClickListener { _, viewHolder ->
+    adapter.takeIsInstance<CachedStatusWrapper>()?.run {
+        when (viewHolder.itemViewType) {
+            -2 -> setCurrentStatusIf(-2, { takeIsInstance<CachedAutoRefreshAdapter<String>>()?.itemCount == 0 })
+            0 -> Unit
+            else -> setCurrentStatus(-2)
+        }
+    }
+}
+addOnItemLongClickListener { _, viewHolder ->
+    adapter.takeIsInstance<CachedStatusWrapper>()?.run {
+        when (viewHolder.itemViewType) {
+            0 -> itemTouchHelper.startDrag(viewHolder)
+            else -> Unit
+        }
+    }
+}
+```
+note: an instence of RecyclerView.OnItemTouchListener is return by these method, with which you should call RecyclerView.removeOnItemTouchListener() at a right time, if not, maybe some thing that is regrettable will happen. 
