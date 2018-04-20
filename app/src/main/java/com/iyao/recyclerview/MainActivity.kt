@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                }.apply {
                     addHeader(android.R.layout.simple_list_item_multiple_choice + 1,
                             CacheViewHolder(layoutInflater
                                     .inflate(android.R.layout.simple_list_item_multiple_choice,
@@ -111,7 +110,6 @@ class MainActivity : AppCompatActivity() {
                                         childView<TextView>(android.R.id.text1)?.text = "Footer: 女孩感冒右腿截肢"
                                     })
                 }
-            }.apply {
                 addStatusView(-2, CacheViewHolder(layoutInflater.inflate(R.layout.layout_data_empty, recycler_view, false)))
             }
             addOnItemClickListener { _, viewHolder ->
@@ -128,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
             addOnItemLongClickListener { _, viewHolder ->
                 adapter.takeIsInstance<CachedStatusWrapper>()?.run {
                     when (viewHolder.itemViewType) {

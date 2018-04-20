@@ -78,7 +78,8 @@ open class GridLayoutItemDecoration : RecyclerView.ItemDecoration() {
                 registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
 
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                        notifyItemRangeChanged(positionStart + itemCount, getItemCount() - itemCount - positionStart + 1, CHANGE_NONE_CONTENT)
+                        val startPosition = positionStart + itemCount - 1
+                        notifyItemRangeChanged(startPosition, getItemCount() - startPosition, CHANGE_NONE_CONTENT)
                     }
 
                     override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
