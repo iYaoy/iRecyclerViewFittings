@@ -116,14 +116,16 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
 
     @MainThread
     fun clearChoices() = checkedStates.clear().run {
-        checkedIds.takeIf { hasStableIds() }?.run {
-            (checkedCount - 1 downTo 0).forEach { it ->
-                checkedIds.valueAt(it)?.run {
-                    checkedIds.removeAt(it)
+        checkedIds.takeIf { hasStableIds() }?.apply {
+            (checkedCount - 1 downTo 0).filter { it >= 0 && it < size() }.forEach { it ->
+                valueAt(it)?.run {
+                    removeAt(it)
                     notifyItemChanged(this, this@MultipleChoiceWrapper.javaClass.simpleName)
                 }
             }
-        }
+
+        } ?: notifyDataSetChanged()
+        checkedCount = 0
     }
 
 

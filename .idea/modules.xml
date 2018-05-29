@@ -3,8 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/recycler-view.iml" filepath="$PROJECT_DIR$/recycler-view.iml" />
+      <module fileurl="file://D:\android\study\iRecyclerViewFittings\app\app.iml" filepath="D:\android\study\iRecyclerViewFittings\app\app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/iRecyclerViewFittings.iml" filepath="$PROJECT_DIR$/.idea/iRecyclerViewFittings.iml" />
+      <module fileurl="file://D:\android\study\iRecyclerViewFittings\recycler-view.iml" filepath="D:\android\study\iRecyclerViewFittings\recycler-view.iml" />
       <module fileurl="file://$PROJECT_DIR$/recycler_view_helper/recycler_view_helper.iml" filepath="$PROJECT_DIR$/recycler_view_helper/recycler_view_helper.iml" />
+      <module fileurl="file://D:\android\study\iRecyclerViewFittings\recycler_view_helper\recycler_view_helper.iml" filepath="D:\android\study\iRecyclerViewFittings\recycler_view_helper\recycler_view_helper.iml" />
     </modules>
   </component>
 </project>
