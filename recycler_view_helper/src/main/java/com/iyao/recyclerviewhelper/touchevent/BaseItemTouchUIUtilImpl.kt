@@ -3,10 +3,10 @@ package com.iyao.recyclerviewhelper.touchevent
 import android.graphics.Canvas
 import android.os.Build
 import android.support.v4.view.ViewCompat
-import android.support.v7.recyclerview.R
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchUIUtil
 import android.view.View
+import com.iyao.recyclerviewhelper.R
 
 
 open class BaseItemTouchUIUtilImpl : ItemTouchUIUtil {
@@ -23,12 +23,12 @@ open class BaseItemTouchUIUtilImpl : ItemTouchUIUtil {
             translationX = dX
             translationY = dY
             if (isCurrentlyActive) {
-                var originalElevation: Any? = getTag(R.id.item_touch_helper_previous_elevation)
+                var originalElevation: Any? = getTag(R.integer.item_touch_helper_previous_elevation)
                 if (originalElevation == null) {
                     originalElevation = ViewCompat.getElevation(view)
                     val newElevation = this@BaseItemTouchUIUtilImpl.elevation + findMaxElevation(recyclerView, view)
                     ViewCompat.setElevation(this, newElevation)
-                    setTag(R.id.item_touch_helper_previous_elevation, originalElevation)
+                    setTag(R.integer.item_touch_helper_previous_elevation, originalElevation)
                 }
             }
         }
@@ -43,10 +43,10 @@ open class BaseItemTouchUIUtilImpl : ItemTouchUIUtil {
             translationX = 0f
             translationY = 0f
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                (getTag(R.id.item_touch_helper_previous_elevation) as? Float)?.run {
+                (getTag(R.integer.item_touch_helper_previous_elevation) as? Float)?.run {
                     ViewCompat.setElevation(this@apply, this)
                 }
-                setTag(R.id.item_touch_helper_previous_elevation, null)
+                setTag(R.integer.item_touch_helper_previous_elevation, null)
             }
         }
     }

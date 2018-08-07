@@ -5,7 +5,7 @@ import com.iyao.recyclerviewhelper.adapter.getWrappedPosition
 import com.iyao.recyclerviewhelper.adapter.takeIsInstance
 import java.util.*
 
-class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCallback(dragDirs, swipeDirs) {
+open class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCallback(dragDirs, swipeDirs) {
 
     init {
         swipeEnable = true

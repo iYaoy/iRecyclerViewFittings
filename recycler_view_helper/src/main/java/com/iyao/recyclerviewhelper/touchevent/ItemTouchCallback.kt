@@ -12,6 +12,7 @@ open class ItemTouchCallback(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.Si
     var swipeEnable = true
     var longPressDragEnable = false
     var onMove: (RecyclerView, RecyclerView.ViewHolder, RecyclerView.ViewHolder) -> Boolean = { _, _, _ -> false }
+    var onMoved: (RecyclerView, RecyclerView.ViewHolder, Int, RecyclerView.ViewHolder, Int, Int, Int) -> Unit = { _, _, _, _, _, _, _ -> Unit}
     var onSwiped: (RecyclerView.ViewHolder, Int) -> Unit = { _, _ -> }
     var canDragOver: (RecyclerView, RecyclerView.ViewHolder, RecyclerView.ViewHolder) -> Boolean = { _, _, _ -> true }
     var itemTouchUIUtil: ItemTouchUIUtil = ItemTouchHelper.Callback.getDefaultUIUtil()
@@ -19,8 +20,17 @@ open class ItemTouchCallback(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.Si
     var moveThreshold: (RecyclerView.ViewHolder) -> Float = { _ -> 0.5f }
     var swipeThreshold: (RecyclerView.ViewHolder)->Float = { .5f }
     var swipeVelocityThreshold: (Float)->Float = { it }
+    var actionState: Int = ItemTouchHelper.ACTION_STATE_IDLE
+    private set
+
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         return onMove.invoke(recyclerView, viewHolder, target)
+    }
+
+    override fun onMoved(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+                         fromPos: Int, target: RecyclerView.ViewHolder, toPos: Int, x: Int,
+                         y: Int) {
+        onMoved.invoke(recyclerView, viewHolder, fromPos, target, toPos, x, y)
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -58,6 +68,7 @@ open class ItemTouchCallback(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.Si
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         Log.e("tag", "viewHolder = $viewHolder, actionState = $actionState")
+        this.actionState = actionState
         if (viewHolder != null) {
             itemTouchUIUtil.onSelected(viewHolder.itemView)
         }

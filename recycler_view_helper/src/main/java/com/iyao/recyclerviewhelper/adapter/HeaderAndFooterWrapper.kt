@@ -21,15 +21,6 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
         }
     }
 
-    override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
-        getWrappedPosition(position).run {
-            when(this) {
-                in 0 until client.itemCount -> client.onBindViewHolder(holder, this, payloads)
-                else -> super.onBindViewHolder(holder, position, payloads)
-            }
-        }
-    }
-
     override fun onBindViewHolder(holder: VH, position: Int) {
         if (position in headers.size() until itemCount - footers.size()) {
             client.onBindViewHolder(holder, getWrappedPosition(position))

@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
                                 return layoutInflater
                                         .inflate(android.R.layout.simple_list_item_multiple_choice, parent, false)
                                         .let {
+                                            it.isEnabled = false
                                             it.setBackgroundColor(Color.WHITE)
                                             CacheViewHolder(it)
                                         }

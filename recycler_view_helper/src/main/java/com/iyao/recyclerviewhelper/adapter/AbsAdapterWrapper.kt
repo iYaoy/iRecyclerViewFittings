@@ -13,7 +13,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     private val observer = object : RecyclerView.AdapterDataObserver() {
         override fun onChanged()
                 = notifyItemRangeChanged(getWrapperAdapterPosition(0), client.itemCount)
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?)
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any)
                 = notifyItemRangeChanged(getWrapperAdapterPosition(positionStart), itemCount, payload)
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int)
@@ -69,6 +69,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
         when {
             payloads.isNotEmpty() && payloads[0] == CHANGE_NONE_CONTENT -> Unit
+            payloads.isNotEmpty() -> client.onBindViewHolder(holder, getWrappedPosition(position), payloads)
             else -> onBindViewHolder(holder, position)
         }
     }

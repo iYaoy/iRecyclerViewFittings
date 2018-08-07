@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="item_touch_helper_previous_elevation">0x2f2f2f</integer>
+</resources>

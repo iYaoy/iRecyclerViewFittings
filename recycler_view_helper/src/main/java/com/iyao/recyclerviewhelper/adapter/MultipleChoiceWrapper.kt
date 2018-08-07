@@ -82,7 +82,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) = client.onBindViewHolder(holder, getWrappedPosition(position)).also {
-        (holder.itemView as? Checkable)?.isChecked = isItemChecked(position)
+//        (holder.itemView as? Checkable)?.isChecked = isItemChecked(position)
     }
 
     override fun getWrappedPosition(wrapperPosition: Int) = wrapperPosition
