@@ -13,7 +13,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     private val observer = object : RecyclerView.AdapterDataObserver() {
         override fun onChanged()
                 = notifyItemRangeChanged(getWrapperAdapterPosition(0), client.itemCount)
-        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any)
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?)
                 = notifyItemRangeChanged(getWrapperAdapterPosition(positionStart), itemCount, payload)
 
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int)
@@ -31,7 +31,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        check(::client.isInitialized, {"client is null ： ${javaClass.simpleName}"})
+        check(::client.isInitialized) {"client is null ： ${javaClass.simpleName}"}
         client.onAttachedToRecyclerView(recyclerView)
         client.registerAdapterDataObserver(observer)
     }
@@ -42,7 +42,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     }
 
     override fun onViewAttachedToWindow(holder: VH) {
-        check(::client.isInitialized, {"client is null : ${javaClass.simpleName}"})
+        check(::client.isInitialized) {"client is null : ${javaClass.simpleName}"}
         client.onViewAttachedToWindow(holder)
 
     }
