@@ -74,7 +74,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
 
     override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
         when {
-            payloads.isNotEmpty() && payloads[0] == this.javaClass.simpleName -> {
+            payloads.isNotEmpty() && payloads[0] == MULTIPLE_CHOICE_PAYLOAD -> {
                 (holder.itemView as? Checkable)?.isChecked = isItemChecked(position)
             }
             else -> super.onBindViewHolder(holder, position, payloads)
@@ -94,7 +94,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
         if (checked != isItemChecked(position)) {
             checkedStates.put(position, checked)
             checkedCount = if (checked) checkedCount + 1 else checkedCount - 1
-            notifyItemChanged(position, this@MultipleChoiceWrapper.javaClass.simpleName)
+            notifyItemChanged(position, MULTIPLE_CHOICE_PAYLOAD)
             if (hasStableIds()) {
                 getItemId(position).let {
                     checked.run {
@@ -112,21 +112,23 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
 
     fun getItemCheckedCount() = checkedCount
 
-    fun getCheckedItemIds() = LongArray(getItemCheckedCount(), { position -> checkedIds.keyAt(position) })
+    fun getCheckedItemIds() = LongArray(getItemCheckedCount()) { position -> checkedIds.keyAt(position) }
 
     @MainThread
-    fun clearChoices() = checkedStates.clear().run {
+    fun clearChoices() = {
         checkedIds.takeIf { hasStableIds() }?.apply {
-            (checkedCount - 1 downTo 0).filter { it >= 0 && it < size() }.forEach { it ->
+            (size() - 1 downTo 0).forEach { it ->
                 valueAt(it)?.run {
-                    removeAt(it)
-                    notifyItemChanged(this, this@MultipleChoiceWrapper.javaClass.simpleName)
+                    setItemChecked(this, false)
                 }
             }
-
-        } ?: notifyDataSetChanged()
-        checkedCount = 0
+        } ?: (0 until checkedStates.size()).forEach {
+            setItemChecked(checkedStates.keyAt(it), false)
+        }
+        checkedStates.clear()
     }
 
-
+    private companion object {
+        const val MULTIPLE_CHOICE_PAYLOAD = "multiple_choice"
+    }
 }

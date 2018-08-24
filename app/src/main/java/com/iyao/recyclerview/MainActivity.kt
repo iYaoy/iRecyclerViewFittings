@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             adapter = CachedStatusWrapper().apply {
                 client = CachedHeaderAndFooterWrapper().apply {
                     client = CachedMultipleChoiceWrapper().apply {
-                        setHasStableIds(true)
+//                        setHasStableIds(true)
                         client = object : CachedAutoRefreshAdapter<String>() {
 
                             override fun getItemId(position: Int) = if (position in 0 until itemCount) position.toLong() else -1
@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
             addOnItemLongClickListener { _, viewHolder ->
                 adapter.takeIsInstance<CachedStatusWrapper>()?.run {
                     when (viewHolder.itemViewType) {
-                        -2 -> setCurrentStatusIf(-2, { takeIsInstance<CachedAutoRefreshAdapter<String>>()?.itemCount == 0 })
+                        -2 -> setCurrentStatusIf(-2) { takeIsInstance<CachedAutoRefreshAdapter<String>>()?.itemCount == 0 }
                         in android.R.layout.simple_list_item_multiple_choice + 1
                                 ..android.R.layout.simple_list_item_multiple_choice + 3  -> setCurrentStatus(-2)
                         0 -> itemTouchHelper.startDrag(viewHolder)
@@ -140,82 +140,50 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+
+
     }
 
     override fun onResume() {
         super.onResume()
+                                      recycler_view.post {
+                                      }
+        recycler_view.postDelayed({
+                                      val autoRefreshAdapter = recycler_view.adapter.takeIsInstance<CachedAutoRefreshAdapter<String>>()
+                                      autoRefreshAdapter?.run {
+                                          listOf(
+                                                  "臧鸿飞曝婚内出轨"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "詹姆斯超越科比"
+                                                  , "韩庚再聊退团经历"
+                                                  , "韩庚再聊退团经历"
+                                                  , "韩庚再聊退团经历"
+                                                  , "韩庚再聊退团经历"
+                                                  , "韩庚再聊退团经历"
+                                                  , "女子在墓园摔伤"
+                                                ).also {
+                                              refresh(it, null)
+                                          }
+                                      }
+                                      recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(3, true)
+                                          recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(5, true)
+                                      recycler_view.adapter.takeIsInstance<CachedStatusWrapper>()?.setCurrentStatusIf(-2) { autoRefreshAdapter?.isEmpty() == true }
 
-        @Suppress("UNCHECKED_CAST")
-        recycler_view.adapter.takeIsInstance<CachedAutoRefreshAdapter<String>>()?.run {
-            listOf(
-                    "臧鸿飞曝婚内出轨"
-                    , "詹姆斯超越科比"
-                    , "韩庚再聊退团经历"
-                    , "韩庚再聊退团经历"
-                    , "韩庚再聊退团经历"
-                    , "韩庚再聊退团经历"
-                    , "韩庚再聊退团经历"
-                    , "女子在墓园摔伤"
-            ).also {
-                refresh(it, object : DiffUtil.Callback() {
-                    override fun getOldListSize(): Int {
-                        return size
-                    }
+                                  }, 2000)
 
-                    override fun getNewListSize(): Int {
-                        return it.size
-                    }
 
-                    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                        return get(oldItemPosition) == it[newItemPosition]
-                    }
-
-                    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                        return false
-                    }
-                })
-            }
-
-            listOf(
-                    { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    , { add(3, "女子在墓园摔伤") }
-                    ,{ add(0, "女孩感冒右腿截肢") }
-                    ,{ this@run[3] = "女孩感冒右腿截肢" }
-                    ,{ this@run[4] = "女孩感冒右腿截肢" }
-                    ,{ addAll(listOf("菲利普亲王入院", "棚改专项债问世")) }
-                    ,{ add("YouTube总部枪击") }
-                    ,{ addAll(0, listOf("76人大胜篮网", "美国公布征税清单")) }
-                    ,{ remove("76人大胜篮网") }
-                    ,{ removeAll(listOf("76人大胜篮网", "美国公布征税清单")) }
-                    ,{ retainAll(listOf("菲利普亲王入院", "棚改专项债问世")) }
-                    ,{ addAll(listOf("76人大胜篮网", "美国公布征税清单", "女孩感冒右腿截肢", "美国公布征税清单")) }
-            ).toMutableList().run {
-                timer("AutoRefresh", false, 1000, 1000,
-                        {
-                            recycler_view.post {
-                                if (isNotEmpty()) {
-                                    removeAt(0).invoke()
-                                }
-                            }
-                        })
-            }
-        }
     }
 }
