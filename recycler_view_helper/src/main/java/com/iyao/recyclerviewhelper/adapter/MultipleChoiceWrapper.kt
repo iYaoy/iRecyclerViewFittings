@@ -91,7 +91,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
 
     @MainThread
     fun setItemChecked(position: Int, checked: Boolean) {
-        if (checked != isItemChecked(position)) {
+        if (position in 0 until itemCount && checked != isItemChecked(position)) {
             checkedStates.put(position, checked)
             checkedCount = if (checked) checkedCount + 1 else checkedCount - 1
             notifyItemChanged(position, MULTIPLE_CHOICE_PAYLOAD)
@@ -115,15 +115,19 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapp
     fun getCheckedItemIds() = LongArray(getItemCheckedCount()) { position -> checkedIds.keyAt(position) }
 
     @MainThread
-    fun clearChoices() = {
-        checkedIds.takeIf { hasStableIds() }?.apply {
-            (size() - 1 downTo 0).forEach { it ->
-                valueAt(it)?.run {
-                    setItemChecked(this, false)
+    fun clearChoices() {
+        if (hasStableIds()) {
+            checkedIds.apply {
+                (size() - 1 downTo 0).forEach { it ->
+                    valueAt(it)?.run {
+                        setItemChecked(this, false)
+                    }
                 }
             }
-        } ?: (0 until checkedStates.size()).forEach {
-            setItemChecked(checkedStates.keyAt(it), false)
+        } else {
+            (0 until checkedStates.size()).forEach {
+                setItemChecked(checkedStates.keyAt(it), false)
+            }
         }
         checkedStates.clear()
     }
