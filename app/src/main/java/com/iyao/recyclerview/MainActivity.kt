@@ -179,6 +179,7 @@ class MainActivity : AppCompatActivity() {
                                           }
                                       }
                                       recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(3, true)
+                                      recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.clearChoices()
                                           recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(5, true)
                                       recycler_view.adapter.takeIsInstance<CachedStatusWrapper>()?.setCurrentStatusIf(-2) { autoRefreshAdapter?.isEmpty() == true }
 

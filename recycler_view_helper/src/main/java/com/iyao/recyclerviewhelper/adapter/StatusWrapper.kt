@@ -46,7 +46,7 @@ class StatusWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
     override fun getWrapperAdapterPosition(wrappedPosition: Int) = wrappedPosition
 
     fun addStatusView(@IntRange(from = -100, to = -2) viewType: Int, holder : VH) {
-        check(viewType in -2 downTo -100, {"status must not be negative integer"}).run {
+        check(viewType in -2 downTo -100) {"status must not be negative integer"}.run {
             statusViewHolders.put(viewType, holder)
         }
     }
@@ -63,5 +63,6 @@ class StatusWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
             currentStatus = this?.let { status } ?: STATUS_NORMAL
             notifyDataSetChanged()
         }
+
     }
 }
