@@ -12,7 +12,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     lateinit var client: RecyclerView.Adapter<VH>
     private val observer = object : RecyclerView.AdapterDataObserver() {
         override fun onChanged()
-                = notifyItemRangeChanged(getWrapperAdapterPosition(0), client.itemCount)
+                = notifyDataSetChanged()
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?)
                 = notifyItemRangeChanged(getWrapperAdapterPosition(positionStart), itemCount, payload)
 
