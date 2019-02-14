@@ -15,8 +15,16 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         return when {
-            headers.indexOfKey(viewType) >= 0 -> headers[viewType]
-            footers.indexOfKey(viewType) >= 0 -> footers[viewType]
+            headers.indexOfKey(viewType) >= 0 -> {
+                val vh = headers[viewType]
+                (vh.itemView.parent as? ViewGroup)?.removeView(vh.itemView)
+                vh
+            }
+            footers.indexOfKey(viewType) >= 0 -> {
+                val vh = footers[viewType]
+                (vh.itemView.parent as? ViewGroup)?.removeView(vh.itemView)
+                vh
+            }
             else -> client.onCreateViewHolder(parent, viewType)
         }
     }

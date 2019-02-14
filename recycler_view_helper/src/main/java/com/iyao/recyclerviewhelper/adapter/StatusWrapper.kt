@@ -17,10 +17,13 @@ class StatusWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
     override fun getItemCount() = if (currentStatus == STATUS_NORMAL) super.getItemCount() else 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        return if (currentStatus != STATUS_NORMAL) {
-            statusViewHolders.get(currentStatus)
-        } else {
-            client.onCreateViewHolder(parent, viewType)
+        return when {
+            currentStatus != STATUS_NORMAL -> {
+                val vh = statusViewHolders.get(currentStatus)
+                (vh.itemView.parent as? ViewGroup)?.removeView(vh.itemView)
+                vh
+            }
+            else -> client.onCreateViewHolder(parent, viewType)
         }
     }
 
