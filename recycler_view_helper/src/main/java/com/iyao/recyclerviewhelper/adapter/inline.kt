@@ -10,31 +10,36 @@ import java.lang.NullPointerException
 /*********************Adapter***************************/
 
 fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withSingleChoice(checkableId: Int):  SingleChoiceWrapper<VH> {
-    return withWrapper(SingleChoiceWrapper(checkableId))
+    return if (this is SingleChoiceWrapper<VH>) this else withWrapper(SingleChoiceWrapper(checkableId))
 }
 
 fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withMultiChoice(checkableId: Int):  MultipleChoiceWrapper<VH> {
-    return withWrapper(MultipleChoiceWrapper(checkableId))
+    return if (this is MultipleChoiceWrapper<VH>) this else withWrapper(MultipleChoiceWrapper(checkableId))
 }
 
 fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withStatusViews(vararg statusViews: Pair<Int, VH>):  StatusWrapper<VH> {
-    val statusWrapper = StatusWrapper<VH>()
+    val statusWrapper = if (this is StatusWrapper<VH>) this else withWrapper<VH, StatusWrapper<VH>>(StatusWrapper())
     statusViews.forEach {
         statusWrapper.addStatusView(it.first, it.second)
     }
     return withWrapper(statusWrapper)
 }
 
-fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withHeaderAndFooter(headers: Array<Pair<Int, VH>> = arrayOf(),
-                                                                               footers: Array<Pair<Int, VH>> = arrayOf()): HeaderAndFooterWrapper<VH> {
-    val headerAndFooterWrapper = HeaderAndFooterWrapper<VH>()
+fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withHeader(vararg headers: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
+    val headerAndFooterWrapper = if (this is HeaderAndFooterWrapper<VH>) this else withWrapper<VH,HeaderAndFooterWrapper<VH>>(HeaderAndFooterWrapper())
     headers.forEach {
         headerAndFooterWrapper.addHeader(it.first, it.second)
     }
-    footers.forEach {
-        headerAndFooterWrapper.addFooter(it.first, it.second)
+    return headerAndFooterWrapper
+}
+
+
+fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withFooter(vararg headers: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
+    val headerAndFooterWrapper = if (this is HeaderAndFooterWrapper<VH>) this else withWrapper<VH,HeaderAndFooterWrapper<VH>>(HeaderAndFooterWrapper())
+    headers.forEach {
+        headerAndFooterWrapper.addHeader(it.first, it.second)
     }
-    return withWrapper(headerAndFooterWrapper)
+    return headerAndFooterWrapper
 }
 
 

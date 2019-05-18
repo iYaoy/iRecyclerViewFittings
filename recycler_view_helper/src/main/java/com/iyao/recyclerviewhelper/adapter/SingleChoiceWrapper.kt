@@ -8,7 +8,7 @@ import androidx.annotation.IdRes
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 
-class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private var checkableId: Int = 0): AbsAdapterWrapper<VH>() {
+class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checkableId: Int = 0): AbsAdapterWrapper<VH>() {
 
     private var checkedPosition = -1
     set(value) {
@@ -73,7 +73,7 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private var checka
     override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
         when {
             payloads.isNotEmpty() && payloads[0] == SINGLE_CHOICE_PAYLOAD -> {
-                holder.getCheckable().isChecked = isItemChecked(position)
+                holder.getCheckable()?.isChecked = isItemChecked(position)
             }
             else -> super.onBindViewHolder(holder, position, payloads)
         }
@@ -81,7 +81,7 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private var checka
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         client.onBindViewHolder(holder, getWrappedPosition(position))
-        holder.getCheckable().isChecked = isItemChecked(position)
+        holder.getCheckable()?.isChecked = isItemChecked(position)
     }
 
     override fun getWrappedPosition(wrapperPosition: Int) = wrapperPosition
@@ -111,8 +111,8 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private var checka
         setItemChecked(-1, true)
     }
 
-    private fun RecyclerView.ViewHolder.getCheckable(): Checkable {
-        return itemView.findViewById<View>(checkableId) as Checkable
+    private fun RecyclerView.ViewHolder.getCheckable(): Checkable? {
+        return itemView.findViewById<View>(checkableId) as? Checkable
     }
 
     private companion object {
