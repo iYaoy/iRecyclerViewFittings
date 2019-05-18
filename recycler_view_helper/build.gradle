@@ -6,14 +6,26 @@ apply plugin: 'kotlin-android-extensions'
 androidExtensions {
     experimental = true
 }
+
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'iyao92'
+    groupId = 'com.iyao.recyclerview'
+    artifactId = 'adapter'
+    publishVersion = '1.0.3'
+    desc = 'a recyclerview adapter helper in kotlin'
+    website = 'https://github.com/iYaoy/iRecyclerViewFittings'
+    repoName = 'android'
+}
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
 
 
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 26
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -34,6 +46,6 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compileOnly 'com.android.support:appcompat-v7:26.1.0'
-    compileOnly 'com.android.support:recyclerview-v7:26.1.0'
+    compileOnly 'androidx.appcompat:appcompat:1.0.2'
+    compileOnly 'androidx.recyclerview:recyclerview:1.1.0-alpha05'
 }

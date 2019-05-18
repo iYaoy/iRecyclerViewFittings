@@ -1,10 +1,10 @@
 package com.iyao.recyclerviewhelper.touchevent
 
-import android.support.v7.widget.RecyclerView
 import android.view.GestureDetector
 import android.view.MotionEvent
+import androidx.recyclerview.widget.RecyclerView
 
-fun RecyclerView.addOnItemClickListener(runnable: (RecyclerView, RecyclerView.ViewHolder)->Unit) : RecyclerView.OnItemTouchListener {
+fun RecyclerView.addOnItemClickListener(runnable: RecyclerView.(RecyclerView.ViewHolder)->Unit) : RecyclerView.OnItemTouchListener {
     return object : RecyclerView.OnItemTouchListener {
         val listener = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onSingleTapUp(e: MotionEvent): Boolean {
@@ -30,7 +30,7 @@ fun RecyclerView.addOnItemClickListener(runnable: (RecyclerView, RecyclerView.Vi
     }
 }
 
-fun RecyclerView.addOnItemLongClickListener(runnable: (RecyclerView, RecyclerView.ViewHolder)->Unit) : RecyclerView.OnItemTouchListener{
+fun RecyclerView.addOnItemLongClickListener(runnable: RecyclerView.(RecyclerView.ViewHolder)->Unit) : RecyclerView.OnItemTouchListener{
     return object : RecyclerView.OnItemTouchListener {
         val listener = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onLongPress(e: MotionEvent) {

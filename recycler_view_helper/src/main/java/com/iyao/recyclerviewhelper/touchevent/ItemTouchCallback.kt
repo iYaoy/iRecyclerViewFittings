@@ -1,10 +1,10 @@
 package com.iyao.recyclerviewhelper.touchevent
 
 import android.graphics.Canvas
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
-import android.support.v7.widget.helper.ItemTouchUIUtil
 import android.util.Log
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchUIUtil
+import androidx.recyclerview.widget.RecyclerView
 
 
 open class ItemTouchCallback(dragDirs: Int, swipeDirs: Int) : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {

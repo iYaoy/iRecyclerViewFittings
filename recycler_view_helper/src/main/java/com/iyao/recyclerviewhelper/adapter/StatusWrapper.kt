@@ -1,12 +1,11 @@
 package com.iyao.recyclerviewhelper.adapter
 
-import android.support.annotation.IntRange
-import android.support.v7.widget.RecyclerView
 import android.util.SparseArray
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import java.lang.IllegalArgumentException
 
-class StatusWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
+class StatusWrapper<VH : RecyclerView.ViewHolder>: AbsAdapterWrapper<VH>() {
 
     companion object {
         const val STATUS_NORMAL = -1
@@ -48,18 +47,18 @@ class StatusWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
 
     override fun getWrapperAdapterPosition(wrappedPosition: Int) = wrappedPosition
 
-    fun addStatusView(@IntRange(from = -100, to = -2) viewType: Int, holder : VH) {
+    fun addStatusView(viewType: Int, holder : VH) {
         check(viewType in -2 downTo -100) {"status must not be negative integer"}.run {
             statusViewHolders.put(viewType, holder)
         }
     }
 
-    fun setCurrentStatus(@IntRange(from = -100, to = -2) viewType: Int) = statusViewHolders[viewType]?.apply {
+    fun setCurrentStatus(viewType: Int) = statusViewHolders[viewType]?.apply {
         currentStatus = viewType
         notifyDataSetChanged()
     } ?: throw IllegalArgumentException("Invalid viewType: $viewType")
 
-    fun setCurrentStatusIf(@IntRange(from = -100, to = -2) status: Int, predicate: (VH) -> Boolean) {
+    fun setCurrentStatusIf(status: Int, predicate: (VH) -> Boolean) {
         statusViewHolders[status]?.takeIf {
             predicate.invoke(it)
         }.run {

@@ -1,7 +1,7 @@
 package com.iyao.recyclerviewhelper.adapter
 
+import androidx.recyclerview.widget.RecyclerView
 
-import android.support.v7.widget.RecyclerView
 
 abstract class MutableListAdapter<VH : RecyclerView.ViewHolder, E> : RecyclerView.Adapter<VH>(), MutableList<E> {
 

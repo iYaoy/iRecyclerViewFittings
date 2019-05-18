@@ -1,9 +1,9 @@
 package com.iyao.recyclerviewhelper.itemdecoration
 
 import android.graphics.Rect
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.iyao.recyclerviewhelper.adapter.AbsAdapterWrapper.Companion.CHANGE_NONE_CONTENT
 import kotlin.math.min
 
@@ -58,7 +58,7 @@ open class GridLayoutItemDecoration : RecyclerView.ItemDecoration() {
                                 spanSizeLookup.getSpanSize(it) == spanCount || spanIndex == spanCount - 1 -> startAndEndDecoration
                                 else -> state.get<Int>(KEY_FRLL) + (spanIndex * deltaOffset).toInt()
                             }
-                            bottom = if (groupIndex == spanSizeLookup.getSpanGroupIndex(parent.adapter.itemCount - 1, spanCount)) topAndBottomDecoration else verticalMiddleDecoration
+                            bottom = if (groupIndex == spanSizeLookup.getSpanGroupIndex(parent.adapter?.itemCount?:0 - 1, spanCount)) topAndBottomDecoration else verticalMiddleDecoration
                         }
                     }
 
@@ -74,7 +74,7 @@ open class GridLayoutItemDecoration : RecyclerView.ItemDecoration() {
     private fun registerObserverIfNeed(state: RecyclerView.State, parent: RecyclerView) {
         if (state.get<Boolean?>(KEY_REGISTER_OBSERVER) != true) {
             state.put(KEY_REGISTER_OBSERVER, true)
-            parent.adapter.apply {
+            parent.adapter?.apply {
                 registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
 
                     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {

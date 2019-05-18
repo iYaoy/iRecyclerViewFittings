@@ -1,6 +1,7 @@
 package com.iyao.recyclerviewhelper.adapter
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
+import kotlin.properties.Delegates
 
 
 abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Adapter<VH>(), AdapterWrapper {
@@ -9,7 +10,8 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
         val CHANGE_NONE_CONTENT = Any()
     }
 
-    lateinit var client: RecyclerView.Adapter<VH>
+    var client: RecyclerView.Adapter<VH> by Delegates.notNull()
+
     private val observer = object : RecyclerView.AdapterDataObserver() {
         override fun onChanged()
                 = notifyDataSetChanged()
@@ -31,7 +33,6 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        check(::client.isInitialized) {"client is null ： ${javaClass.simpleName}"}
         client.onAttachedToRecyclerView(recyclerView)
         client.registerAdapterDataObserver(observer)
     }
@@ -42,7 +43,6 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     }
 
     override fun onViewAttachedToWindow(holder: VH) {
-        check(::client.isInitialized) {"client is null : ${javaClass.simpleName}"}
         client.onViewAttachedToWindow(holder)
 
     }
@@ -60,7 +60,7 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
         client.onViewRecycled(holder)
     }
 
-    override fun getItemCount() = if (::client.isInitialized) client.itemCount else 0
+    override fun getItemCount() = client.itemCount
 
     override fun getItemViewType(position: Int): Int {
         return client.getItemViewType(getWrappedPosition(position))

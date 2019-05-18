@@ -2,8 +2,8 @@ package com.iyao.recyclerviewhelper.touchevent
 
 import android.graphics.*
 import android.os.Build
-import android.support.v7.widget.RecyclerView
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
 
 class PlaceHolderItemTouchUIUtilImpl : BaseItemTouchUIUtilImpl() {

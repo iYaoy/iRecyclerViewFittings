@@ -1,8 +1,8 @@
 package com.iyao.recyclerviewhelper.adapter
 
-import android.support.v7.widget.RecyclerView
 import android.util.SparseArray
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 
 
 open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {

@@ -3,19 +3,17 @@ package com.iyao.recyclerview
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.iyao.recyclerviewhelper.adapter.*
 import com.iyao.recyclerviewhelper.itemdecoration.GridLayoutItemDecoration
 import com.iyao.recyclerviewhelper.touchevent.MutableListAdapterImpl
 import com.iyao.recyclerviewhelper.touchevent.addOnItemClickListener
 import com.iyao.recyclerviewhelper.touchevent.addOnItemLongClickListener
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.concurrent.timer
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             layoutManager = GridLayoutManager(this@MainActivity, 5).apply {
                 spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                     override fun getSpanSize(position: Int): Int {
-                        return when (adapter.getItemViewType(position)) {
+                        return when (adapter?.getItemViewType(position)) {
                             //statusView
                             in -100..-1 -> spanCount
                             in android.R.layout.simple_list_item_multiple_choice + 1..android.R.layout.simple_list_item_multiple_choice + 3 -> spanCount
@@ -112,7 +110,8 @@ class MainActivity : AppCompatActivity() {
                     currentStatus = -2
                 }
             }
-            addOnItemClickListener { _, viewHolder ->
+            addOnItemClickListener { viewHolder ->
+                val adapter = adapter ?: return@addOnItemClickListener
                 adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.run {
                     adapter.getWrappedPosition(this, viewHolder.adapterPosition).run {
                         setItemChecked(this, !isItemChecked(this))
@@ -127,7 +126,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            addOnItemLongClickListener { _, viewHolder ->
+            addOnItemLongClickListener { viewHolder ->
+                val adapter = adapter ?: return@addOnItemLongClickListener
                 adapter.takeIsInstance<CachedStatusWrapper>()?.run {
                     when (viewHolder.itemViewType) {
                         -2 -> setCurrentStatusIf(
@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         recycler_view.postDelayed({
-                                      val autoRefreshAdapter = recycler_view.adapter.takeIsInstance<CachedAutoRefreshAdapter<String>>()
+                                      val autoRefreshAdapter = recycler_view.adapter?.takeIsInstance<CachedAutoRefreshAdapter<String>>()
                                       autoRefreshAdapter?.run {
                                           listOf("臧鸿飞曝婚内出轨", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
                                                  "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
@@ -158,12 +158,12 @@ class MainActivity : AppCompatActivity() {
                                               refresh(it, null)
                                           }
                                       }
-                                      recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
+                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
                                               3, true)
-                                      recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.clearChoices()
-                                      recycler_view.adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
+                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.clearChoices()
+                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
                                               5, true)
-                                      recycler_view.adapter.takeIsInstance<CachedStatusWrapper>()?.setCurrentStatusIf(
+                                      recycler_view.adapter?.takeIsInstance<CachedStatusWrapper>()?.setCurrentStatusIf(
                                               -2) { autoRefreshAdapter?.isEmpty() == true }
 
                                   }, 2000)

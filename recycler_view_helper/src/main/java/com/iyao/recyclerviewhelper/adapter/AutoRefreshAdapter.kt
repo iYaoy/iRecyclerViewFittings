@@ -1,8 +1,8 @@
 package com.iyao.recyclerviewhelper.adapter
 
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
 
 abstract class AutoRefreshAdapter<VH : RecyclerView.ViewHolder, E> : MutableListAdapter<VH, E>() {
 
