@@ -39,24 +39,24 @@ private fun <VH: RecyclerView.ViewHolder, Adapter: AbsAdapterWrapper<VH>> Recycl
     return wrapper.also { it.client = this }
 }
 
-fun RecyclerView.Adapter<*>.getStatusWrapper(index: Int = 0): CachedStatusWrapper {
-    return takeIsInstance(index)
+fun RecyclerView.getStatusWrapper(index: Int = 0): CachedStatusWrapper {
+    return takeAdapterInstance(index)
 }
 
-fun RecyclerView.Adapter<*>.getMultiWrapper(index: Int = 0): CachedMultipleChoiceWrapper {
-    return takeIsInstance(index)
+fun RecyclerView.getMultiWrapper(index: Int = 0): CachedMultipleChoiceWrapper {
+    return takeAdapterInstance(index)
 }
 
-fun RecyclerView.Adapter<*>.getHeaderFooterWrapper(index: Int = 0): CachedHeaderAndFooterWrapper {
-    return takeIsInstance(index)
+fun RecyclerView.getHeaderFooterWrapper(index: Int = 0): CachedHeaderAndFooterWrapper {
+    return takeAdapterInstance(index)
 }
 
-inline fun <reified E> RecyclerView.Adapter<*>.getAutoRefreshAdapter(index: Int = 0): AutoRefreshAdapter<CacheViewHolder, E> {
-    return takeIsInstance(index)
+inline fun <reified E> RecyclerView.getAutoRefreshAdapter(index: Int = 0): AutoRefreshAdapter<CacheViewHolder, E> {
+    return takeAdapterInstance(index)
 }
 
-inline fun <reified R : Any> RecyclerView.Adapter<*>.takeIsInstance(index: Int = 0): R {
-    var adapter : RecyclerView.Adapter<*>? = this
+inline fun <reified R : Any> RecyclerView.takeAdapterInstance(index: Int = 0): R {
+    var adapter : RecyclerView.Adapter<*>? = adapter
     var count = -1
     while (index > count && adapter is AbsAdapterWrapper<*>) {
         if (adapter is R && ++count == index) {
