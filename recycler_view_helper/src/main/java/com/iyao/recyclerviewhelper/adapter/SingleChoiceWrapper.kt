@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checkableId: Int = 0): AbsAdapterWrapper<VH>() {
 
-    private var checkedPosition = -1
-    set(value) {
+    var checkedPosition = -1
+    private set(value) {
         field = value
         onCheckedChangeListener?.invoke(value)
     }

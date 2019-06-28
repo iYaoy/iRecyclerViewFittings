@@ -1,11 +1,9 @@
 package com.iyao.recyclerviewhelper.adapter
 
 import android.view.View
-import android.widget.Checkable
 import androidx.annotation.IdRes
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.extensions.LayoutContainer
-import java.lang.NullPointerException
 
 /*********************Adapter***************************/
 
@@ -17,28 +15,22 @@ fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withMultiChoice(check
     return if (this is MultipleChoiceWrapper<VH>) this else withWrapper(MultipleChoiceWrapper(checkableId))
 }
 
-fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withStatusViews(vararg statusViews: Pair<Int, VH>):  StatusWrapper<VH> {
+fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withStatusView(statusView: Pair<Int, VH>):  StatusWrapper<VH> {
     val statusWrapper = if (this is StatusWrapper<VH>) this else withWrapper<VH, StatusWrapper<VH>>(StatusWrapper())
-    statusViews.forEach {
-        statusWrapper.addStatusView(it.first, it.second)
-    }
-    return withWrapper(statusWrapper)
+    statusWrapper.addStatusView(statusView.first, statusView.second)
+    return statusWrapper
 }
 
-fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withHeader(vararg headers: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
+fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withHeader(header: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
     val headerAndFooterWrapper = if (this is HeaderAndFooterWrapper<VH>) this else withWrapper<VH,HeaderAndFooterWrapper<VH>>(HeaderAndFooterWrapper())
-    headers.forEach {
-        headerAndFooterWrapper.addHeader(it.first, it.second)
-    }
+    headerAndFooterWrapper.addHeader(header.first, header.second)
     return headerAndFooterWrapper
 }
 
 
-fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withFooter(vararg headers: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
+fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withFooter(footer: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
     val headerAndFooterWrapper = if (this is HeaderAndFooterWrapper<VH>) this else withWrapper<VH,HeaderAndFooterWrapper<VH>>(HeaderAndFooterWrapper())
-    headers.forEach {
-        headerAndFooterWrapper.addHeader(it.first, it.second)
-    }
+    headerAndFooterWrapper.addHeader(footer.first, footer.second)
     return headerAndFooterWrapper
 }
 
@@ -47,28 +39,32 @@ private fun <VH: RecyclerView.ViewHolder, Adapter: AbsAdapterWrapper<VH>> Recycl
     return wrapper.also { it.client = this }
 }
 
-fun RecyclerView.Adapter<*>.getStatusWrapper(): CachedStatusWrapper {
-    return takeIsInstance() ?: throw NullPointerException("there is no CachedStatusWrapper")
+fun RecyclerView.Adapter<*>.getStatusWrapper(index: Int = 0): CachedStatusWrapper {
+    return takeIsInstance(index)
 }
 
-fun RecyclerView.Adapter<*>.getMultiWrapper(): CachedMultipleChoiceWrapper {
-    return takeIsInstance() ?: throw NullPointerException("there is no CachedMultipleChoiceWrapper")
+fun RecyclerView.Adapter<*>.getMultiWrapper(index: Int = 0): CachedMultipleChoiceWrapper {
+    return takeIsInstance(index)
 }
 
-fun RecyclerView.Adapter<*>.getHeaderAndFooterWrapper(): CachedHeaderAndFooterWrapper {
-    return takeIsInstance() ?: throw NullPointerException("there is no CachedHeaderAndFooterWrapper")
+fun RecyclerView.Adapter<*>.getHeaderFooterWrapper(index: Int = 0): CachedHeaderAndFooterWrapper {
+    return takeIsInstance(index)
 }
 
-fun <E> RecyclerView.Adapter<*>.getAutoRefreshAdapter(): AutoRefreshAdapter<CacheViewHolder, E> {
-    return takeIsInstance() ?: throw NullPointerException("there is no AutoRefreshAdapter")
+inline fun <reified E> RecyclerView.Adapter<*>.getAutoRefreshAdapter(index: Int = 0): AutoRefreshAdapter<CacheViewHolder, E> {
+    return takeIsInstance(index)
 }
 
-inline fun <reified R : Any> RecyclerView.Adapter<*>.takeIsInstance(): R?  {
+inline fun <reified R : Any> RecyclerView.Adapter<*>.takeIsInstance(index: Int = 0): R {
     var adapter : RecyclerView.Adapter<*>? = this
-    while (adapter !is R && adapter is AbsAdapterWrapper<*>) {
+    var count = -1
+    while (index > count && adapter is AbsAdapterWrapper<*>) {
+        if (adapter is R && ++count == index) {
+            break
+        }
         adapter = adapter.getWrappedAdapter()
     }
-    return adapter as? R?
+    return adapter as? R ?: throw IllegalStateException("there are less than ${index+1} ${R::class} instance")
 }
 
 tailrec fun RecyclerView.Adapter<*>.getWrappedPosition(wrappedAdapter: RecyclerView.Adapter<*>, outerPosition: Int): Int {
