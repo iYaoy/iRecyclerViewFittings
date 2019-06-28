@@ -59,8 +59,12 @@ fun RecyclerView.requireAdapter(): RecyclerView.Adapter<*> {
     return adapter ?: throw IllegalStateException("adapter not attach")
 }
 
-inline fun <reified R : Any> RecyclerView.takeAdapterInstance(index: Int = 0): R {
-    var adapter : RecyclerView.Adapter<*>? = adapter
+inline fun <reified R> RecyclerView.takeAdapterInstance(index: Int = 0): R {
+    return adapter?.takeInstance<R>(index) ?: throw IllegalStateException("no adapter attached")
+}
+
+inline fun <reified R> RecyclerView.Adapter<*>.takeInstance(index: Int = 0): R {
+    var adapter : RecyclerView.Adapter<*>? = this
     var count = -1
     while (index > count && adapter is AbsAdapterWrapper<*>) {
         if (adapter is R && ++count == index) {
