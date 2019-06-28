@@ -111,15 +111,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             addOnItemClickListener { viewHolder ->
-                val adapter = adapter ?: return@addOnItemClickListener
-                adapter.takeIsInstance<CachedMultipleChoiceWrapper>()?.run {
-                    adapter.getWrappedPosition(this, viewHolder.adapterPosition).run {
+                takeAdapterInstance<CachedMultipleChoiceWrapper>().run {
+                    requireAdapter().getWrappedPosition(this, viewHolder.adapterPosition).run {
                         setItemChecked(this, !isItemChecked(this))
                     }
                 }
-                adapter.takeIsInstance<CachedStatusWrapper>()?.run {
+                takeAdapterInstance<CachedStatusWrapper>().run {
                     when (viewHolder.itemViewType) {
-                        -2 -> setCurrentStatusIf(-2) { takeIsInstance<CachedAutoRefreshAdapter<String>>()?.itemCount == 0 }
+                        -2 -> setCurrentStatusIf(-2) { takeAdapterInstance<CachedAutoRefreshAdapter<String>>().itemCount == 0 }
                         0 -> Unit
                         else -> setCurrentStatus(-2)
                     }
@@ -127,11 +126,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             addOnItemLongClickListener { viewHolder ->
-                val adapter = adapter ?: return@addOnItemLongClickListener
-                adapter.takeIsInstance<CachedStatusWrapper>()?.run {
+                takeAdapterInstance<CachedStatusWrapper>().run {
                     when (viewHolder.itemViewType) {
                         -2 -> setCurrentStatusIf(
-                                -2) { takeIsInstance<CachedAutoRefreshAdapter<String>>()?.itemCount == 0 }
+                                -2) { takeAdapterInstance<CachedAutoRefreshAdapter<String>>().itemCount == 0 }
                         in android.R.layout.simple_list_item_multiple_choice + 1..android.R.layout.simple_list_item_multiple_choice + 3 -> setCurrentStatus(
                                 -2)
                         0 -> itemTouchHelper.startDrag(viewHolder)
@@ -147,26 +145,26 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         recycler_view.postDelayed({
-                                      val autoRefreshAdapter = recycler_view.adapter?.takeIsInstance<CachedAutoRefreshAdapter<String>>()
-                                      autoRefreshAdapter?.run {
-                                          listOf("臧鸿飞曝婚内出轨", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
-                                                 "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
-                                                 "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
-                                                 "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "韩庚再聊退团经历",
-                                                 "韩庚再聊退团经历", "韩庚再聊退团经历", "韩庚再聊退团经历", "韩庚再聊退团经历",
-                                                 "女子在墓园摔伤").also {
-                                              refresh(it, null)
-                                          }
-                                      }
-                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
-                                              3, true)
-                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.clearChoices()
-                                      recycler_view.adapter?.takeIsInstance<CachedMultipleChoiceWrapper>()?.setItemChecked(
-                                              5, true)
-                                      recycler_view.adapter?.takeIsInstance<CachedStatusWrapper>()?.setCurrentStatusIf(
-                                              -2) { autoRefreshAdapter?.isEmpty() == true }
+            val autoRefreshAdapter = recycler_view.takeAdapterInstance<CachedAutoRefreshAdapter<String>>()
+            autoRefreshAdapter.run {
+                listOf("臧鸿飞曝婚内出轨", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
+                        "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
+                        "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比",
+                        "詹姆斯超越科比", "詹姆斯超越科比", "詹姆斯超越科比", "韩庚再聊退团经历",
+                        "韩庚再聊退团经历", "韩庚再聊退团经历", "韩庚再聊退团经历", "韩庚再聊退团经历",
+                        "女子在墓园摔伤").also {
+                    refresh(it, null)
+                }
+            }
+            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().setItemChecked(
+                    3, true)
+            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().clearChoices()
+            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().setItemChecked(
+                    5, true)
+            recycler_view.takeAdapterInstance<CachedStatusWrapper>().setCurrentStatusIf(
+                    -2) { autoRefreshAdapter.isEmpty() }
 
-                                  }, 2000)
+        }, 2000)
 
 
     }

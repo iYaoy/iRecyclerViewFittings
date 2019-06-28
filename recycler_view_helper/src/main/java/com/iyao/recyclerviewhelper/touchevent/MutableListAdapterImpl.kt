@@ -2,7 +2,7 @@ package com.iyao.recyclerviewhelper.touchevent
 
 import com.iyao.recyclerviewhelper.adapter.MutableListAdapter
 import com.iyao.recyclerviewhelper.adapter.getWrappedPosition
-import com.iyao.recyclerviewhelper.adapter.takeIsInstance
+import com.iyao.recyclerviewhelper.adapter.takeAdapterInstance
 import java.util.*
 
 open class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCallback(dragDirs, swipeDirs) {
@@ -14,7 +14,7 @@ open class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCall
             when {
                 recyclerView.isComputingLayout || recyclerView.isComputingLayout -> false
                 else -> recyclerView.adapter?.let {
-                    it.takeIsInstance<MutableListAdapter<*, *>>()?.apply {
+                    recyclerView.takeAdapterInstance<MutableListAdapter<*, *>>().apply {
                         val fromPosition = viewHolder.adapterPosition
                         val toPosition = target.adapterPosition
                         val wrappedFromPosition = it.getWrappedPosition(this, fromPosition)
@@ -30,7 +30,6 @@ open class MutableListAdapterImpl(dragDirs: Int, swipeDirs: Int) : ItemTouchCall
                         }
                         notifyItemMoved(wrappedFromPosition, wrappedToPosition)
                     }
-                            ?: throw IllegalStateException("the adapter of the recycler view must be(or wrap an instance of) ${MutableListAdapter::class.java.simpleName}")
                 }?.let { true } ?: throw NullPointerException("the adapter is null")
             }
         }

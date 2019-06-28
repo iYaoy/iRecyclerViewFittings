@@ -55,6 +55,10 @@ inline fun <reified E> RecyclerView.getAutoRefreshAdapter(index: Int = 0): AutoR
     return takeAdapterInstance(index)
 }
 
+fun RecyclerView.requireAdapter(): RecyclerView.Adapter<*> {
+    return adapter ?: throw IllegalStateException("adapter not attach")
+}
+
 inline fun <reified R : Any> RecyclerView.takeAdapterInstance(index: Int = 0): R {
     var adapter : RecyclerView.Adapter<*>? = adapter
     var count = -1

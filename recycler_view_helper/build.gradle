@@ -13,7 +13,7 @@ publish {
     userOrg = 'iyao92'
     groupId = 'com.iyao.recyclerview'
     artifactId = 'adapter'
-    publishVersion = '1.0.7'
+    publishVersion = '1.0.8'
     desc = 'a recyclerview adapter helper in kotlin'
     website = 'https://github.com/iYaoy/iRecyclerViewFittings'
     repoName = 'android'
