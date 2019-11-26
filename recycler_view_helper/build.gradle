@@ -13,7 +13,7 @@ publish {
     userOrg = 'iyao92'
     groupId = 'com.iyao.recyclerview'
     artifactId = 'adapter'
-    publishVersion = '1.0.8'
+    publishVersion = '1.1.2'
     desc = 'a recyclerview adapter helper in kotlin'
     website = 'https://github.com/iYaoy/iRecyclerViewFittings'
     repoName = 'android'
@@ -46,6 +46,6 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compileOnly 'androidx.appcompat:appcompat:1.0.2'
-    compileOnly 'androidx.recyclerview:recyclerview:1.1.0-alpha05'
+    compileOnly 'androidx.appcompat:appcompat:1.1.0'
+    compileOnly 'androidx.recyclerview:recyclerview:1.1.0'
 }

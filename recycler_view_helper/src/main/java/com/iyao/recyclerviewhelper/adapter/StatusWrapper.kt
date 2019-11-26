@@ -43,9 +43,13 @@ class StatusWrapper<VH : RecyclerView.ViewHolder>: AbsAdapterWrapper<VH>() {
         return if (currentStatus != STATUS_NORMAL) currentStatus else client.getItemViewType(getWrappedPosition(position))
     }
 
-    override fun getWrappedPosition(wrapperPosition: Int) = wrapperPosition
+    override fun getWrappedPosition(wrapperPosition: Int): Int {
+        return if (currentStatus == STATUS_NORMAL) wrapperPosition else -1
+    }
 
-    override fun getWrapperAdapterPosition(wrappedPosition: Int) = wrappedPosition
+    override fun getWrapperAdapterPosition(wrappedPosition: Int): Int {
+        return if (currentStatus == STATUS_NORMAL) wrappedPosition else -1
+    }
 
     fun addStatusView(viewType: Int, holder : VH) {
         check(viewType in -2 downTo -100) {"status must not be negative integer"}.run {

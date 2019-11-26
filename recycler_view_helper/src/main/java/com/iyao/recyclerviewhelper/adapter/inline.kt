@@ -30,16 +30,19 @@ fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withHeader(header: Pa
 
 fun <VH: RecyclerView.ViewHolder> RecyclerView.Adapter<VH>.withFooter(footer: Pair<Int, VH>): HeaderAndFooterWrapper<VH> {
     val headerAndFooterWrapper = if (this is HeaderAndFooterWrapper<VH>) this else withWrapper<VH,HeaderAndFooterWrapper<VH>>(HeaderAndFooterWrapper())
-    headerAndFooterWrapper.addHeader(footer.first, footer.second)
+    headerAndFooterWrapper.addFooter(footer.first, footer.second)
     return headerAndFooterWrapper
 }
 
-
-private fun <VH: RecyclerView.ViewHolder, Adapter: AbsAdapterWrapper<VH>> RecyclerView.Adapter<VH>.withWrapper(wrapper: Adapter): Adapter {
+fun <VH: RecyclerView.ViewHolder, Adapter: AbsAdapterWrapper<VH>> RecyclerView.Adapter<VH>.withWrapper(wrapper: Adapter): Adapter {
     return wrapper.also { it.client = this }
 }
 
 fun RecyclerView.getStatusWrapper(index: Int = 0): CachedStatusWrapper {
+    return takeAdapterInstance(index)
+}
+
+fun RecyclerView.getSingleWrapper(index: Int = 0): CachedSingleChoiceWrapper {
     return takeAdapterInstance(index)
 }
 
@@ -83,6 +86,10 @@ tailrec fun RecyclerView.Adapter<*>.getWrappedPosition(wrappedAdapter: RecyclerV
     }
 }
 
+fun RecyclerView.Adapter<*>.getPositionOrNull(wrappedAdapter: RecyclerView.Adapter<*>, outerPosition: Int): Int? {
+    return getWrappedPosition(wrappedAdapter, outerPosition).takeIf { it >= 0 }
+}
+
 /**********************ViewHolder************************/
 inline fun <reified V : View> RecyclerView.ViewHolder.childView(@IdRes id: Int): V? {
     return itemView.findViewById(id)
@@ -95,3 +102,4 @@ typealias CachedAutoRefreshAdapter<E> = AutoRefreshAdapter<CacheViewHolder, E>
 typealias CachedStatusWrapper = StatusWrapper<CacheViewHolder>
 typealias CachedHeaderAndFooterWrapper = HeaderAndFooterWrapper<CacheViewHolder>
 typealias CachedMultipleChoiceWrapper = MultipleChoiceWrapper<CacheViewHolder>
+typealias CachedSingleChoiceWrapper = SingleChoiceWrapper<CacheViewHolder>
