@@ -7,6 +7,15 @@ import androidx.recyclerview.widget.RecyclerView
 
 open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
 
+    var recycledViewPool = object : RecyclerView.RecycledViewPool() {
+        override fun getRecycledView(viewType: Int): RecyclerView.ViewHolder? {
+            val vh = super.getRecycledView(viewType)
+            if (vh != null && (vh != getFooterByViewType(viewType) || vh != getHeaderByViewType(viewType))) {
+                return null
+            }
+            return vh
+        }
+    }
 
     private val headers : SparseArray<VH> = SparseArray()
     private val footers : SparseArray<VH> = SparseArray()
@@ -29,6 +38,11 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
         }
     }
 
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerView.setRecycledViewPool(recycledViewPool)
+    }
+
     override fun onBindViewHolder(holder: VH, position: Int) {
         if (position in headers.size() until itemCount - footers.size()) {
             client.onBindViewHolder(holder, getWrappedPosition(position))
@@ -47,12 +61,14 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
 
     override fun getWrapperAdapterPosition(wrappedPosition: Int) = wrappedPosition.plus(headers.size())
 
+    private fun startFooterPosition() = headers.size().plus(client.itemCount)
+
     fun addHeader(viewType: Int, holder: VH) {
-        val old = headers[viewType]
+        val old = getHeaderByViewType(viewType)
         if (old != holder) {
-            headers.put(viewType, holder)
+            headers.putInternal(viewType, holder)
         }
-        val position = headers.indexOfKey(viewType)
+        val position = getHeaderPosition(viewType)
         if (old == null) {
             //新增
             notifyItemInserted(position)
@@ -63,11 +79,11 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
 
 
     fun addFooter(viewType: Int, holder: VH) {
-        val old = footers[viewType]
+        val old = getFooterByViewType(viewType)
         if (old != holder) {
-            footers.put(viewType, holder)
+            footers.putInternal(viewType, holder)
         }
-        val position = footers.indexOfKey(viewType) + headers.size() + client.itemCount
+        val position = getFooterPosition(viewType)
         if (old == null) {
             notifyItemInserted(position)
         } else {
@@ -79,71 +95,171 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
      * 移动Header或Footer到指定位置
      */
     fun move(fromViewType: Int, toViewType: Int, toHeader: Boolean): Boolean {
-        val old = removeHeader(fromViewType) ?: removeFooter(fromViewType) ?: return false
-        if (toHeader) {
-            addHeader(toViewType, old)
-        } else {
-            addFooter(toViewType, old)
+        val (fromPosition, holder) = when {
+            isHeader(fromViewType) -> removeInternal(fromViewType, true)
+            isFooter(fromViewType) -> removeInternal(fromViewType, false)
+            else -> return false
         }
+        if (holder == null || fromPosition < 0) {
+            return false
+        }
+        val toPosition = if (toHeader) {
+            headers.putInternal(toViewType, holder)
+            getHeaderPosition(toViewType)
+        } else {
+            footers.putInternal(toViewType, holder)
+            getFooterPosition(toViewType)
+        }
+        notifyItemMoved(fromPosition, toPosition)
         return true
     }
 
     fun move(holder: VH, toViewType: Int, toHeader: Boolean): Boolean {
-        removeHeader(holder) ?: removeFooter(holder) ?: return false
-        if (toHeader) {
-            addHeader(toViewType, holder)
-        } else {
-            addFooter(toViewType, holder)
+        val (fromPosition, viewType) = when {
+            isHeader(holder) -> removeInternal(holder, true)
+            isFooter(holder) -> removeInternal(holder, false)
+            else -> return false
         }
+        if (viewType == null || fromPosition < 0) {
+            return false
+        }
+        val toPosition = if (toHeader) {
+            headers.putInternal(toViewType, holder)
+            getHeaderPosition(toViewType)
+        } else {
+            footers.putInternal(toViewType, holder)
+            getFooterPosition(toViewType)
+        }
+        notifyItemMoved(fromPosition, toPosition)
         return true
     }
 
+    fun remove(viewType: Int): VH? {
+        return if (isHeader(viewType)) {
+            removeHeader(viewType)
+        } else {
+            removeFooter(viewType)
+        }
+    }
+
     fun removeHeader(viewType: Int): VH? {
-        val position = headers.indexOfKey(viewType).takeIf { it in 0 until headers.size() } ?: return null
-        val holder = headers.valueAt(position)
-        headers.removeAt(position)
-        notifyItemRemoved(position)
+        val (position, holder) = removeInternal(viewType, true)
+        if (position >= 0) {
+            notifyItemRemoved(position)
+        }
         return holder
     }
 
     fun removeHeader(holder: VH): Int? {
-        val position = headers.indexOfValue(holder).takeIf { it in 0 until headers.size() } ?: return null
-        val viewType = headers.keyAt(position)
-        headers.removeAt(position)
-        notifyItemRemoved(position)
+        val (position, viewType) = removeInternal(holder, true)
+        if (position >= 0) {
+            notifyItemRemoved(position)
+        }
         return viewType
     }
 
+
+
     fun removeFooter(viewType: Int): VH? {
-        val position = footers.indexOfKey(viewType).takeIf { it in 0 until footers.size() } ?: return null
-        val holder = footers.valueAt(position)
-        footers.removeAt(position)
-        notifyItemRemoved(headers.size().plus(client.itemCount).plus(position))
+        val (position, holder) = removeInternal(viewType, false)
+        if (position >= 0) {
+            notifyItemRemoved(position)
+        }
         return holder
     }
 
     fun removeFooter(holder: VH): Int? {
-        val position = footers.indexOfValue(holder).takeIf { it in 0 until footers.size() } ?: return null
-        val viewType = footers.keyAt(position)
-        footers.removeAt(position)
-        notifyItemRemoved(headers.size().plus(client.itemCount).plus(position))
+        val (position, viewType) = removeInternal(holder, false)
+        if (position >= 0) {
+            notifyItemRemoved(position)
+        }
         return viewType
     }
 
+    private fun removeInternal(viewType: Int, isHeader: Boolean): Pair<Int, VH?> {
+        val container = if (isHeader) headers else footers
+        val index = container.indexOfKey(viewType)
+        val holder = container.safeValueAt(index)
+        container.safeRemoveAt(index)
+        val position = when {
+            index < 0 -> -1
+            isHeader -> index
+            else -> index + startFooterPosition()
+        }
+        return position to holder
+    }
+
+    private fun removeInternal(holder: VH, isHeader: Boolean): Pair<Int, Int?> {
+        val container = if (isHeader) headers else footers
+        val index = container.indexOfValue(holder)
+        val viewType = container.safeKeyAt(index)
+        container.safeRemoveAt(index)
+        val position = when {
+            index < 0 -> -1
+            isHeader -> index
+            else -> index + startFooterPosition()
+        }
+        return position to viewType
+    }
+
     fun clearHeaders() {
-        val itemCount = headers.size()
+        val size = headers.size()
         headers.clear()
-        notifyItemRangeRemoved(0, itemCount)
+        notifyItemRangeRemoved(0, size)
     }
 
     fun clearFooters() {
-        val itemCount = footers.size()
+        val size = footers.size()
         footers.clear()
-        notifyItemRangeRemoved(itemCount-itemCount, itemCount)
+        notifyItemRangeRemoved(startFooterPosition(), size)
     }
 
     fun clearAll() {
         clearHeaders()
         clearFooters()
+    }
+
+    fun getHeaderPosition(viewType: Int) = headers.indexOfKey(viewType)
+
+    fun getHeaderPosition(holder: VH) = headers.indexOfValue(holder)
+
+    fun getHeaderByPosition(position: Int) = headers.valueAt(position)
+
+    fun getHeaderByViewType(viewType: Int): VH? = headers[viewType]
+
+    fun getHeaderViewTypeByPosition(position: Int) = headers.keyAt(position)
+
+    fun getFooterPosition(viewType: Int) = footers.indexOfKey(viewType) + startFooterPosition()
+
+    fun getFooterPosition(holder: VH) = footers.indexOfValue(holder) + startFooterPosition()
+
+    fun getFooterByPosition(position: Int) = headers.valueAt(position - startFooterPosition())
+
+    fun getFooterByViewType(viewType: Int): VH? = footers[viewType]
+
+    fun getFooterViewTypeByPosition(position: Int) = headers.keyAt(position - startFooterPosition())
+
+    fun isHeader(viewType: Int) = headers.indexOfKey(viewType) >= 0
+
+    fun isHeader(holder: VH) = headers.indexOfValue(holder)>=0
+
+    fun isFooter(viewType: Int) = footers.indexOfKey(viewType) >= 0
+
+    fun isFooter(holder: VH) = footers.indexOfValue(holder)>=0
+
+    private fun SparseArray<VH>.putInternal(viewType: Int, holder: VH) {
+        put(viewType, holder)
+    }
+
+    private fun SparseArray<VH>.safeKeyAt(index: Int): Int? {
+        return if (index in 0 until size()) keyAt(index) else null
+    }
+
+    private fun SparseArray<VH>.safeValueAt(index: Int): VH? {
+        return if (index in 0 until size()) valueAt(index) else null
+    }
+
+    private fun SparseArray<VH>.safeRemoveAt(index: Int) {
+        if (index in 0 until size()) removeAt(index)
     }
 }

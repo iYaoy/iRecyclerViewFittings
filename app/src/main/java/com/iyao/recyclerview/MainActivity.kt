@@ -4,10 +4,12 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.CheckedTextView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.iyao.recyclerviewhelper.adapter.*
 import com.iyao.recyclerviewhelper.itemdecoration.GridLayoutItemDecoration
 import com.iyao.recyclerviewhelper.touchevent.MutableListAdapterImpl
@@ -27,116 +29,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recycler_view.apply {
-            layoutManager = GridLayoutManager(this@MainActivity, 5).apply {
-                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (adapter?.getItemViewType(position)) {
-                            //statusView
-                            in -100..-1 -> spanCount
-                            in android.R.layout.simple_list_item_multiple_choice + 1..android.R.layout.simple_list_item_multiple_choice + 3 -> spanCount
-                            else -> 1
-                        }
-                    }
+            layoutManager = LinearLayoutManager(context)
+            adapter = object : CachedAutoRefreshAdapter<String>() {
+                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CacheViewHolder {
+                    val itemView = layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, parent, false)
+                    return CacheViewHolder(itemView)
                 }
-            }
-            itemTouchHelper.attachToRecyclerView(this)
-            addItemDecoration(GridLayoutItemDecoration().apply {
-                startAndEndDecoration = 50
-                topAndBottomDecoration = 30
-                horizontalMiddleDecoration = 30
-                verticalMiddleDecoration = 30
-                decorateFullItem = true
-            })
-            adapter = CachedHeaderAndFooterWrapper().apply {
-                client = CachedStatusWrapper().apply {
-                    client = CachedMultipleChoiceWrapper().apply {
-                        //                        setHasStableIds(true)
-                        client = object : CachedAutoRefreshAdapter<String>() {
 
-                            override fun getItemId(
-                                    position: Int) = if (position in 0 until itemCount) position.toLong() else -1
-
-                            override fun onCreateViewHolder(parent: ViewGroup,
-                                                            viewType: Int): CacheViewHolder {
-                                return layoutInflater.inflate(
-                                        android.R.layout.simple_list_item_multiple_choice, parent,
-                                        false).let {
-                                            it.isEnabled = false
-                                            it.setBackgroundColor(Color.WHITE)
-                                            CacheViewHolder(it)
-                                        }
-                            }
-
-                            override fun onBindViewHolder(holder: CacheViewHolder, position: Int) {
-                                holder.childView<TextView>(android.R.id.text1)?.text = get(position)
-                            }
-
-                            override fun onBindViewHolder(holder: CacheViewHolder, position: Int,
-                                                          payloads: MutableList<Any>) {
-                                holder.childView<TextView>(android.R.id.text1)?.run {
-                                    when {
-                                        payloads.isEmpty() -> super.onBindViewHolder(holder,
-                                                                                     position,
-                                                                                     payloads)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    addHeader(android.R.layout.simple_list_item_multiple_choice + 1,
-                              CacheViewHolder(layoutInflater.inflate(
-                                      android.R.layout.simple_list_item_multiple_choice,
-                                      recycler_view, false)).apply {
-                                  itemView.setBackgroundColor(Color.WHITE)
-                                  childView<TextView>(android.R.id.text1)?.text = "Header: 菲利普亲王入院"
-                              })
-                    addHeader(android.R.layout.simple_list_item_multiple_choice + 2,
-                              CacheViewHolder(layoutInflater.inflate(
-                                      android.R.layout.simple_list_item_multiple_choice,
-                                      recycler_view, false)).apply {
-                                  itemView.setBackgroundColor(Color.WHITE)
-                                  childView<TextView>(android.R.id.text1)?.text = "Header: 美国公布征税清单"
-                              })
-                    addFooter(android.R.layout.simple_list_item_multiple_choice + 3,
-                              CacheViewHolder(layoutInflater.inflate(
-                                      android.R.layout.simple_list_item_multiple_choice,
-                                      recycler_view, false)).apply {
-                                  itemView.setBackgroundColor(Color.WHITE)
-                                  childView<TextView>(android.R.id.text1)?.text = "Footer: 女孩感冒右腿截肢"
-                              })
-                    addStatusView(-2, CacheViewHolder(
-                            layoutInflater.inflate(R.layout.layout_data_empty, recycler_view,
-                                                   false)))
-                    currentStatus = -2
+                override fun onBindViewHolder(holder: CacheViewHolder, position: Int) {
+                    (holder.itemView as CheckedTextView).text = get(position)
                 }
-            }
-            addOnItemClickListener { viewHolder ->
-                takeAdapterInstance<CachedMultipleChoiceWrapper>().run {
-                    requireAdapter().getWrappedPosition(this, viewHolder.adapterPosition).run {
-                        setItemChecked(this, !isItemChecked(this))
-                    }
-                }
-                takeAdapterInstance<CachedStatusWrapper>().run {
-                    when (viewHolder.itemViewType) {
-                        -2 -> setCurrentStatusIf(-2) { takeAdapterInstance<CachedAutoRefreshAdapter<String>>().itemCount == 0 }
-                        0 -> Unit
-                        else -> setCurrentStatus(-2)
-                    }
-                }
-            }
-
-            addOnItemLongClickListener { viewHolder ->
-                takeAdapterInstance<CachedStatusWrapper>().run {
-                    when (viewHolder.itemViewType) {
-                        -2 -> setCurrentStatusIf(
-                                -2) { takeAdapterInstance<CachedAutoRefreshAdapter<String>>().itemCount == 0 }
-                        in android.R.layout.simple_list_item_multiple_choice + 1..android.R.layout.simple_list_item_multiple_choice + 3 -> setCurrentStatus(
-                                -2)
-                        0 -> itemTouchHelper.startDrag(viewHolder)
-                        else -> Unit
-                    }
-                }
-            }
+            }.withWrapper(CachedHeaderAndFooterWrapper())
+                    .withWrapper(CachedStatusWrapper())
         }
 
 
@@ -144,6 +48,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val wrapper = recycler_view.getHeaderFooterWrapper()
+        recycler_view.apply {
+            wrapper.addHeader(1, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(2, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(3, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(4, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addFooter(5, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(6, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(7, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addFooter(8, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addFooter(9, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addFooter(10, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addFooter(11, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(1, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(2, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(3, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+            wrapper.addHeader(4, CacheViewHolder(layoutInflater.inflate(android.R.layout.simple_list_item_multiple_choice, this, false)))
+        }
+
         recycler_view.postDelayed({
             val autoRefreshAdapter = recycler_view.takeAdapterInstance<CachedAutoRefreshAdapter<String>>()
             autoRefreshAdapter.run {
@@ -156,15 +79,7 @@ class MainActivity : AppCompatActivity() {
                     refresh(it, null)
                 }
             }
-            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().setItemChecked(
-                    3, true)
-            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().clearChoices()
-            recycler_view.takeAdapterInstance<CachedMultipleChoiceWrapper>().setItemChecked(
-                    5, true)
-            recycler_view.takeAdapterInstance<CachedStatusWrapper>().setCurrentStatusIf(
-                    -2) { autoRefreshAdapter.isEmpty() }
-
-        }, 2000)
+        }, 200)
 
 
     }
