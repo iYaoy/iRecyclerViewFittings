@@ -19,3 +19,13 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+#-keep @android.support.annotation.Keep class *
+#-keepclassmembers class * {
+#    @android.support.annotation.Keep *;
+#}
+#
+#-keep class kotlin.** {*;}
+#-keep interface kotlin.** {*;}
+#-keepclassmembernames class kotlinx.** {
+#    volatile <fields>;
+#}

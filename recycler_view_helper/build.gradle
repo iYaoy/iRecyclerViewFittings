@@ -7,17 +7,15 @@ androidExtensions {
     experimental = true
 }
 
-apply plugin: 'com.novoda.bintray-release'
-
-publish {
-    userOrg = 'iyao92'
-    groupId = 'com.iyao.recyclerview'
-    artifactId = 'adapter'
-    publishVersion = '1.1.5'
-    desc = 'a recyclerview adapter helper in kotlin'
-    website = 'https://github.com/iYaoy/iRecyclerViewFittings'
-    repoName = 'android'
-}
+//publish {
+//    userOrg = 'iyao92'
+//    groupId = 'com.iyao.recyclerview'
+//    artifactId = 'adapter'
+//    publishVersion = '1.1.6'
+//    desc = 'a recyclerview adapter helper in kotlin'
+//    website = 'https://github.com/iYaoy/iRecyclerViewFittings'
+//    repoName = 'android'
+//}
 android {
     compileSdkVersion 28
 
@@ -49,3 +47,30 @@ dependencies {
     compileOnly 'androidx.appcompat:appcompat:1.1.0'
     compileOnly 'androidx.recyclerview:recyclerview:1.1.0'
 }
+
+
+ext {
+    orgName = 'iyao92'
+    bintrayRepo = 'android'
+    bintrayName = 'adapter'
+    siteUrl = ''
+    publishedGroupId = 'com.iyao.recyclerview'
+    artifact = 'adapter'
+    libraryVersion = '1.1.8'
+    libraryName = 'adapter'
+    libraryDescription='a recyclerview adapter helper in kotlin'
+
+    developerId = 'iyao'
+    developerName = 'iyao'
+    developerEmail = 'gaorenjie92@gmail.com'
+
+    gitUrl = 'https://github.com/iYaoy/iRecyclerViewFittings.git'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+
+}
+
+apply from: '../installv1.gradle'
+apply from: '../bintrayv1.gradle'

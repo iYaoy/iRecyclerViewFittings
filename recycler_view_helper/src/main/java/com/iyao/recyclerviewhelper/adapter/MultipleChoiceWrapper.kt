@@ -62,6 +62,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        client.unregisterAdapterDataObserver(observer)
         client.registerAdapterDataObserver(observer)
     }
 

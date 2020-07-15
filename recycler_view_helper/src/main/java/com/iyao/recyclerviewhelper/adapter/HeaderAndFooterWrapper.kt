@@ -3,17 +3,15 @@ package com.iyao.recyclerviewhelper.adapter
 import android.util.SparseArray
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.iyao.recyclerviewhelper.pool.minus
+import com.iyao.recyclerviewhelper.pool.plus
 
 
 open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrapper<VH>() {
 
     var recycledViewPool = object : RecyclerView.RecycledViewPool() {
         override fun getRecycledView(viewType: Int): RecyclerView.ViewHolder? {
-            val vh = super.getRecycledView(viewType)
-            if (vh != null && (vh != getFooterByViewType(viewType) || vh != getHeaderByViewType(viewType))) {
-                return null
-            }
-            return vh
+            return getFooterByViewType(viewType) ?: getHeaderByViewType(viewType)
         }
     }
 
@@ -40,7 +38,12 @@ open class HeaderAndFooterWrapper<VH : RecyclerView.ViewHolder> : AbsAdapterWrap
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        recyclerView.setRecycledViewPool(recycledViewPool)
+        recyclerView.setRecycledViewPool(recyclerView.recycledViewPool + recycledViewPool)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        recyclerView.setRecycledViewPool(recyclerView.recycledViewPool - recycledViewPool)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {

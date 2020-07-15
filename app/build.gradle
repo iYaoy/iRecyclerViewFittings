@@ -6,6 +6,14 @@ androidExtensions {
 }
 
 android {
+    signingConfigs {
+        iyao {
+            storeFile file('/Users/Dragon-Li/Desktop/iyao')
+            storePassword '19921211grj'
+            keyAlias = 'iyao'
+            keyPassword '19921211grj'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.iyao.recyclerview"
@@ -17,7 +25,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.iyao
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

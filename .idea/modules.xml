@@ -4,7 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/iRecyclerViewFittings.iml" filepath="$PROJECT_DIR$/.idea/iRecyclerViewFittings.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/iRecyclerViewFittings-app.iml" filepath="$PROJECT_DIR$/app/iRecyclerViewFittings-app.iml" group="iRecyclerViewFittings/app" />
+      <module fileurl="file://$PROJECT_DIR$/recycler_view_helper/iRecyclerViewFittings-recycler_view_helper.iml" filepath="$PROJECT_DIR$/recycler_view_helper/iRecyclerViewFittings-recycler_view_helper.iml" group="iRecyclerViewFittings/recycler_view_helper" />
       <module fileurl="file://$PROJECT_DIR$/recycler_view_helper/recycler_view_helper.iml" filepath="$PROJECT_DIR$/recycler_view_helper/recycler_view_helper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/study-iRecyclerViewFittings.iml" filepath="$PROJECT_DIR$/study-iRecyclerViewFittings.iml" group="iRecyclerViewFittings" />
     </modules>
   </component>
 </project>

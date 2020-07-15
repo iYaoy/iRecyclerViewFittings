@@ -8,13 +8,27 @@ import androidx.annotation.IdRes
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
 
-class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checkableId: Int = 0): AbsAdapterWrapper<VH>() {
+open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checkableId: Int = 0): AbsAdapterWrapper<VH>() {
 
-    var checkedPosition = -1
+    private companion object {
+        const val SINGLE_CHOICE_PAYLOAD = "single_choice"
+    }
+
+    /**
+     * 当前选中的Item Position
+     */
+    var checkedPosition = RecyclerView.NO_POSITION
     private set(value) {
         field = value
         onCheckedChangeListener?.invoke(value)
     }
+
+    /**
+     * 是否允许取消选中
+     */
+    var isCheckedCancelable: Boolean = true
+
+    private var mPreviousCheckedPosition: Int = RecyclerView.NO_POSITION
 
     private var onCheckedChangeListener: ((Int)->Unit)? = null
 
@@ -42,13 +56,14 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
             val position = getWrapperAdapterPosition(positionStart)
             if (checkedPosition in position until position + itemCount) {
-                setItemChecked(-1, true)
+                setItemChecked(RecyclerView.NO_POSITION, true)
             }
         }
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        client.unregisterAdapterDataObserver(observer)
         client.registerAdapterDataObserver(observer)
     }
 
@@ -61,7 +76,11 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val viewHolder = client.onCreateViewHolder(parent, viewType)
-        viewHolder.itemView.findViewById<CompoundButton>(checkableId)?.setOnCheckedChangeListener { _, isChecked ->
+        (viewHolder.itemView.findViewById(checkableId) as? CompoundButton)?.setOnCheckedChangeListener { view, isChecked ->
+            if (!isCheckedCancelable && !isChecked) {
+                view.toggle()
+                return@setOnCheckedChangeListener
+            }
             val adapter = (parent as RecyclerView).adapter ?: return@setOnCheckedChangeListener
             adapter.getWrappedPosition(this, viewHolder.adapterPosition).takeIf { it in 0 until itemCount }?.run {
                 setItemChecked(this, isChecked)
@@ -73,7 +92,7 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
     override fun onBindViewHolder(holder: VH, position: Int, payloads: MutableList<Any>) {
         when {
             payloads.isNotEmpty() && payloads[0] == SINGLE_CHOICE_PAYLOAD -> {
-                holder.getCheckable()?.isChecked = isItemChecked(position)
+                invalidateCheckableState(position, holder)
             }
             else -> super.onBindViewHolder(holder, position, payloads)
         }
@@ -81,7 +100,7 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         client.onBindViewHolder(holder, getWrappedPosition(position))
-        holder.getCheckable()?.isChecked = isItemChecked(position)
+        invalidateCheckableState(position, holder)
     }
 
     override fun getWrappedPosition(wrapperPosition: Int) = wrapperPosition
@@ -94,11 +113,14 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
 
     @MainThread
     fun setItemChecked(position: Int, checked: Boolean) {
-        if (checked != isItemChecked(position)) {
+        if (checked != isItemChecked(position) && (!checked || isCheckedCancelable)) {
             val oldPosition = checkedPosition
-            val newPosition = if (oldPosition == position && !checked) -1 else position
+            val newPosition = if (oldPosition == position && !checked) RecyclerView.NO_POSITION else position
             checkedPosition = newPosition
-            notifyItemChanged(oldPosition, SINGLE_CHOICE_PAYLOAD)
+            mPreviousCheckedPosition = oldPosition
+            if (oldPosition in 0 until itemCount) {
+                notifyItemChanged(oldPosition, SINGLE_CHOICE_PAYLOAD)
+            }
             if (newPosition in 0 until itemCount) {
                 notifyItemChanged(newPosition, SINGLE_CHOICE_PAYLOAD)
             }
@@ -108,14 +130,23 @@ class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checka
     fun isItemChecked(position: Int) = checkedPosition == position
 
     fun clearChoice() {
-        setItemChecked(-1, true)
+        setItemChecked(RecyclerView.NO_POSITION, true)
+    }
+
+    private fun invalidateCheckableState(position: Int, holder: VH) {
+        val itemChecked = isItemChecked(position)
+        val checkable = holder.getCheckable()
+        when {
+            checkable != null -> {
+                checkable.isChecked = itemChecked
+            }
+            itemChecked -> {
+                setItemChecked(mPreviousCheckedPosition, true)
+            }
+        }
     }
 
     private fun RecyclerView.ViewHolder.getCheckable(): Checkable? {
         return itemView.findViewById<View>(checkableId) as? Checkable
-    }
-
-    private companion object {
-        const val SINGLE_CHOICE_PAYLOAD = "single_choice"
     }
 }
