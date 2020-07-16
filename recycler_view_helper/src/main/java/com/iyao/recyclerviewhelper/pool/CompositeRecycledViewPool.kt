@@ -14,10 +14,17 @@ internal class CompositeRecycledViewPool(internal var value: RecyclerView.Recycl
 }
 
 operator fun RecyclerView.RecycledViewPool.plus(other: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool {
+    if (this == other) {
+        return this
+    }
     var tail: RecyclerView.RecycledViewPool = this
     var parent: CompositeRecycledViewPool? = null
     while (tail is CompositeRecycledViewPool) {
         parent = tail
+        //already contained, ignore
+        if (tail.value == other || tail.next == other) {
+            return this
+        }
         tail = tail.next
     }
     return when (parent) {
@@ -30,7 +37,10 @@ operator fun RecyclerView.RecycledViewPool.plus(other: RecyclerView.RecycledView
 }
 
 
-operator fun RecyclerView.RecycledViewPool.minus(extra: RecyclerView.RecycledViewPool?): RecyclerView.RecycledViewPool {
+operator fun RecyclerView.RecycledViewPool.minus(other: RecyclerView.RecycledViewPool?): RecyclerView.RecycledViewPool {
+    if (this == other) {
+        return RecyclerView.RecycledViewPool()
+    }
     if (this !is CompositeRecycledViewPool) {
         return this
     }
@@ -38,18 +48,28 @@ operator fun RecyclerView.RecycledViewPool.minus(extra: RecyclerView.RecycledVie
     var parent : CompositeRecycledViewPool? = null
     var result: RecyclerView.RecycledViewPool = this
     loop@ while (cur is CompositeRecycledViewPool) {
+        val value = cur.value
+        val next = cur.next
         when {
-            cur.value === extra -> {
+            value == other -> {
                 if (parent == null) {
-                    result = cur.next
+                    result = next
                 } else {
-                    parent.next = cur.next
+                    parent.next = next
+                }
+                break@loop
+            }
+            next == other -> {
+                if (parent == null) {
+                    result = value
+                } else {
+                    parent.next = value
                 }
                 break@loop
             }
             else -> {
                 parent = cur
-                cur = cur.next
+                cur = next
             }
         }
     }
