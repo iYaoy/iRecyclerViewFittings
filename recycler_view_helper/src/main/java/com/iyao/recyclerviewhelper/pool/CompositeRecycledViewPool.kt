@@ -2,30 +2,44 @@ package com.iyao.recyclerviewhelper.pool
 
 import androidx.recyclerview.widget.RecyclerView
 
-class CompositeRecycledViewPool(val core: RecyclerView.RecycledViewPool, var extra: RecyclerView.RecycledViewPool?): RecyclerView.RecycledViewPool() {
+class CompositeRecycledViewPool(internal var value: RecyclerView.RecycledViewPool, internal var next: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool() {
 
     override fun getRecycledView(viewType: Int): RecyclerView.ViewHolder? {
-        return core.getRecycledView(viewType) ?: extra?.getRecycledView(viewType)
+        return value.getRecycledView(viewType) ?: next.getRecycledView(viewType)
     }
 
     override fun putRecycledView(scrap: RecyclerView.ViewHolder?) {
-        core.putRecycledView(scrap)
+        value.putRecycledView(scrap)
     }
 }
 
 operator fun RecyclerView.RecycledViewPool.plus(other: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool {
-    return CompositeRecycledViewPool(this, other)
+    return CompositeRecycledViewPool(minus(other), other)
 }
 
 
 operator fun RecyclerView.RecycledViewPool.minus(extra: RecyclerView.RecycledViewPool?): RecyclerView.RecycledViewPool {
-    var pool = this
-    while (pool is CompositeRecycledViewPool) {
-        if (pool.extra === extra) {
-            pool.extra = null
-        } else {
-            pool = pool.core
+    if (this !is CompositeRecycledViewPool) {
+        return this
+    }
+    var cur: RecyclerView.RecycledViewPool = this
+    var parent : CompositeRecycledViewPool? = null
+    var result: RecyclerView.RecycledViewPool = this
+    loop@ while (cur is CompositeRecycledViewPool) {
+        when {
+            cur.value === extra -> {
+                if (parent == null) {
+                    result = cur.next
+                } else {
+                    parent.next = cur.next
+                }
+                break@loop
+            }
+            else -> {
+                parent = cur
+                cur = cur.next
+            }
         }
     }
-    return this
+    return result
 }
