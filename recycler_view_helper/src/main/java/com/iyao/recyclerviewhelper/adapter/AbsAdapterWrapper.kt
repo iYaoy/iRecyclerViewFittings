@@ -34,13 +34,16 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         client.onAttachedToRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
-        client.registerAdapterDataObserver(observer)
+        runCatching {
+            client.registerAdapterDataObserver(observer)
+        }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         client.onDetachedFromRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
+        runCatching {
+            client.unregisterAdapterDataObserver(observer)
+        }
     }
 
     override fun onViewAttachedToWindow(holder: VH) {

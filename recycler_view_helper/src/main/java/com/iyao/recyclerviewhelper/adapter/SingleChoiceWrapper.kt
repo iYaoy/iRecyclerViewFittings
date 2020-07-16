@@ -63,13 +63,16 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
-        client.registerAdapterDataObserver(observer)
+        runCatching {
+            client.registerAdapterDataObserver(observer)
+        }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
+        runCatching {
+            client.unregisterAdapterDataObserver(observer)
+        }
     }
 
     override fun getItemId(position: Int) = client.getItemId(position)
@@ -112,8 +115,13 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
     }
 
     @MainThread
+    fun setItemChecked(position: Int) {
+        setItemChecked(position, true)
+    }
+
+    @MainThread
     fun setItemChecked(position: Int, checked: Boolean) {
-        if (checked != isItemChecked(position) && (!checked || isCheckedCancelable)) {
+        if ((checked || isCheckedCancelable) && checked != isItemChecked(position)) {
             val oldPosition = checkedPosition
             val newPosition = if (oldPosition == position && !checked) RecyclerView.NO_POSITION else position
             checkedPosition = newPosition

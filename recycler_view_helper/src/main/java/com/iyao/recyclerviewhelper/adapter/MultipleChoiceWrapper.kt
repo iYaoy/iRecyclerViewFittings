@@ -62,13 +62,16 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
-        client.registerAdapterDataObserver(observer)
+        runCatching {
+            client.registerAdapterDataObserver(observer)
+        }
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
-        client.unregisterAdapterDataObserver(observer)
+        runCatching {
+            client.unregisterAdapterDataObserver(observer)
+        }
     }
 
     override fun getItemId(position: Int) = client.getItemId(position)
