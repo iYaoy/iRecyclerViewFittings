@@ -2,7 +2,7 @@ package com.iyao.recyclerviewhelper.pool
 
 import androidx.recyclerview.widget.RecyclerView
 
-class CompositeRecycledViewPool(internal var value: RecyclerView.RecycledViewPool, internal var next: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool() {
+internal class CompositeRecycledViewPool(internal var value: RecyclerView.RecycledViewPool, internal var next: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool() {
 
     override fun getRecycledView(viewType: Int): RecyclerView.ViewHolder? {
         return value.getRecycledView(viewType) ?: next.getRecycledView(viewType)
@@ -14,7 +14,19 @@ class CompositeRecycledViewPool(internal var value: RecyclerView.RecycledViewPoo
 }
 
 operator fun RecyclerView.RecycledViewPool.plus(other: RecyclerView.RecycledViewPool): RecyclerView.RecycledViewPool {
-    return CompositeRecycledViewPool(minus(other), other)
+    var tail: RecyclerView.RecycledViewPool = this
+    var parent: CompositeRecycledViewPool? = null
+    while (tail is CompositeRecycledViewPool) {
+        parent = tail
+        tail = tail.next
+    }
+    return when (parent) {
+        null -> CompositeRecycledViewPool(tail, other)
+        else -> {
+            parent.next = CompositeRecycledViewPool(tail, other)
+            this
+        }
+    }
 }
 
 
