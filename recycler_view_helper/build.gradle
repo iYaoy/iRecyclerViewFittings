@@ -56,7 +56,7 @@ ext {
     siteUrl = ''
     publishedGroupId = 'com.iyao.recyclerview'
     artifact = 'adapter'
-    libraryVersion = '1.1.8'
+    libraryVersion = '1.1.10'
     libraryName = 'adapter'
     libraryDescription='a recyclerview adapter helper in kotlin'
 

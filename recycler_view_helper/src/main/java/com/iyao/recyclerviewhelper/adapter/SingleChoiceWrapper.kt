@@ -144,13 +144,8 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
     private fun invalidateCheckableState(position: Int, holder: VH) {
         val itemChecked = isItemChecked(position)
         val checkable = holder.getCheckable()
-        when {
-            checkable != null -> {
-                checkable.isChecked = itemChecked
-            }
-            itemChecked -> {
-                setItemChecked(mPreviousCheckedPosition, true)
-            }
+        if (checkable != null) {
+            checkable.isChecked = itemChecked
         }
     }
 
