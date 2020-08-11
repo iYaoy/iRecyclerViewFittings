@@ -7,6 +7,7 @@ import android.widget.CompoundButton
 import androidx.annotation.IdRes
 import androidx.annotation.MainThread
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.ref.WeakReference
 
 open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val checkableId: Int = 0): AbsAdapterWrapper<VH>() {
 
@@ -22,6 +23,8 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
         field = value
         onCheckedChangeListener?.invoke(value)
     }
+
+    var recyclerView: WeakReference<RecyclerView?> = WeakReference(null)
 
     /**
      * 是否允许取消选中
@@ -63,6 +66,7 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = WeakReference(recyclerView)
         runCatching {
             client.registerAdapterDataObserver(observer)
         }
@@ -73,6 +77,7 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
         runCatching {
             client.unregisterAdapterDataObserver(observer)
         }
+        this.recyclerView = WeakReference(null)
     }
 
     override fun getItemId(position: Int) = client.getItemId(position)
@@ -126,6 +131,7 @@ open class SingleChoiceWrapper<VH: RecyclerView.ViewHolder>(@IdRes private val c
             val newPosition = if (oldPosition == position && !checked) RecyclerView.NO_POSITION else position
             checkedPosition = newPosition
             mPreviousCheckedPosition = oldPosition
+            if (recyclerView.get()?.isComputingLayout == true) return
             if (oldPosition in 0 until itemCount) {
                 notifyItemChanged(oldPosition, SINGLE_CHOICE_PAYLOAD)
             }

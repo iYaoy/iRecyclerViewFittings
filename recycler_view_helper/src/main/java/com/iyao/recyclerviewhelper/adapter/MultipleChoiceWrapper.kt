@@ -8,12 +8,15 @@ import androidx.annotation.IdRes
 import androidx.annotation.MainThread
 import androidx.collection.LongSparseArray
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.ref.WeakReference
 
 open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private var checkableId: Int = 0) : AbsAdapterWrapper<VH>() {
 
     private val checkedIds: LongSparseArray<Int> = LongSparseArray()
     private val checkedStates: SparseBooleanArray = SparseBooleanArray()
     private var checkedCount = 0
+
+    private var recyclerView: WeakReference<RecyclerView?> = WeakReference(null)
 
     private val observer = object : RecyclerView.AdapterDataObserver() {
 
@@ -62,6 +65,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = WeakReference(recyclerView)
         runCatching {
             client.registerAdapterDataObserver(observer)
         }
@@ -72,6 +76,7 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
         runCatching {
             client.unregisterAdapterDataObserver(observer)
         }
+        this.recyclerView = WeakReference(null)
     }
 
     override fun getItemId(position: Int) = client.getItemId(position)
@@ -101,7 +106,6 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
         if (position in 0 until itemCount && checked != isItemChecked(position)) {
             checkedStates.put(position, checked)
             checkedCount = if (checked) checkedCount + 1 else checkedCount - 1
-            notifyItemChanged(position, MULTIPLE_CHOICE_PAYLOAD)
             if (hasStableIds()) {
                 getItemId(position).let {
                     checked.run {
@@ -112,6 +116,8 @@ open class MultipleChoiceWrapper<VH : RecyclerView.ViewHolder>(@IdRes private va
                     }
                 }
             }
+            if (recyclerView.get()?.isComputingLayout == true) return
+            notifyItemChanged(position, MULTIPLE_CHOICE_PAYLOAD)
         } else Unit
     }
 

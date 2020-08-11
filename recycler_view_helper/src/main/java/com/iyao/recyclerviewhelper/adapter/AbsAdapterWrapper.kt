@@ -79,5 +79,4 @@ abstract class AbsAdapterWrapper<VH : RecyclerView.ViewHolder> : RecyclerView.Ad
     }
 
     override fun getWrappedAdapter(): RecyclerView.Adapter<VH> = client
-
 }
